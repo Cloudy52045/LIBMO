@@ -1,1 +1,52 @@
+ 添加一列到指定位置
+ALTE TABLE my_contacts ==ADD column== gender VARCHAR(3) ==AFTER email==;  //新增一列到email前面 FIRST 指定到首列
+ 删除某一列
+ALTER TABLE my_contacts ==DROP== COLUMN gender;
+ 查看表结构
+desc my_contacts;
+##### 替换字符  
+>update 表 set 列表名= ==replace== (列表名,'旧字符','新字符')
+##### 添加约束
+---添加主键约束   
+>Alter Table stuInfo   
+Add Constraint  PK_stuNO ==primary Key(stuNo)==
+
+---添加唯一约束   
+>Alter Table stuInfo   
+>Add Constraint UQ_stuID ==unique(stuID)==   
+
+---添加默认约束   
+>Alter Table stuInfo  
+Add Constraint DF_stuAddress default('地址不详') for stuAddress   
+
+---添加检查约束   
+>Alter Table stuInfo   
+Add Constraint CK_stuAge check(stuAge between 15 and 40)   
+
+---添加外键约束   
+>Alter Table stuMarks   
+Add Constraint FK_stuNo foreign key(stuNo) references stuInfo(stuNo) 
+
+---删除约束
+>Alter Table 表名   Drop Constraint  约束名   
+
+##### 改表名  
+>ALTER TABLE doughnut_list RENAME TO doughnut_list_new  
+
+##### ALTER与CHANGE
+>ALTER TABLE project_list 
+==CHANGE COLUMN== number project_id INT ONT MULL ==AUTO_INCREMENT==,
+ADD PRIMARY KEY (proj_id)；   
+
+##### 合并列表，找出相同数据或不同数据，等于2相同，等于1不同
+>SELECT internal_account FROM(SELECT DISTINCT internal_account FROM job_info_20180104 WHERE machine_code IS NOT NULL AND type=501 AND result LIKE '%频繁%' UNION ALL SELECT DISTINCT internal_account FROM job_info_20180101 WHERE machine_code IS NOT NULL AND type=501 AND result LIKE '%频繁%') ==tbl== GROUP BY internal_account ==having count(*) = 2== ORDER BY internal_account;  
+
+##### MYSQL 时间相减
+>SELECT update_time,execute_time,update_time-execute_time,time_to_sec(timediff(update_time, execute_time)) diff1, timestampdiff(second, update_time,execute_time) diff2,unix_timestamp(update_time) -unix_timestamp(execute_time) diff3 from job_info where internal_account = 'xiangru8932' and type = 501 and status = 604    
+       
+##### 账号分组后，保留一个任务       
+>SELECT * FROM job_info WHERE `status` = 601 AND id in(select MAX(id) from job_info WHERE `status` = 601 GROUP BY internal_account HAVING ==COUNT(1) >= 1==)    
+  
+##### 将账号进行排序，选择固定的任务个数 
+>SELECT a.* from job_info where ==EXISTS== (SELECT count(*) FROM job_info where ==internal_account = a.internal_account== and ==id < a.id== HAVING count(*) < 10 ) ORDER BY a.internal_account   
 
